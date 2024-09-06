@@ -18,7 +18,7 @@ import com.audition.model.AuditionComment;
 import com.audition.model.AuditionPost;
 import com.audition.service.AuditionService;
 
-import jakarta.validation.constraints.Min;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
 @RestController
 @Validated
@@ -29,7 +29,8 @@ public class AuditionController {
 
     // TODO Add a query param that allows data filtering. The intent of the filter is at developers discretion.
     @RequestMapping(value = "/posts", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody List<AuditionPost> getPosts(@RequestParam("userId") Integer userId) {
+    @CircuitBreaker(name = "postsCircuitBreaker", fallbackMethod = "postsServiceFallback")
+    public @ResponseBody List<AuditionPost> getPosts(@RequestParam("userId") final Integer userId) {
 
         // TODO Add logic that filters response data based on the query param
     	List<AuditionPost> auditionPosts = null;
@@ -47,7 +48,7 @@ public class AuditionController {
     }
 
     @RequestMapping(value = "/posts/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody AuditionPost getPostsById(@PathVariable @Min(1) final Integer id) {
+    public @ResponseBody AuditionPost getPostsById(@PathVariable final Integer id) {
     	// TODO Add input validation
     	if(id != null && id.intValue() <=0) {
     		throw new SystemException("Invalid Id: "+id, 400);
@@ -60,7 +61,8 @@ public class AuditionController {
     // TODO Add additional methods to return comments for each post. Hint: Check https://jsonplaceholder.typicode.com/
     
     @RequestMapping(value = "/posts/{postId}/comments", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody List<AuditionComment> getPostComments(@PathVariable @Min(1) String postId) {
+    @CircuitBreaker(name = "commentsCircuitBreaker", fallbackMethod = "commentsServiceFallback")
+    public @ResponseBody List<AuditionComment> getPostComments(@PathVariable String postId) {
 
         // TODO Add logic that filters response data based on the query param
     	if(!StringUtils.isNumeric(postId)) {
@@ -91,5 +93,13 @@ public class AuditionController {
         final List<AuditionComment> auditionComment = auditionService.getCommentbyPostId(postId);
         
         return auditionComment;
+    }
+    
+    public List<AuditionPost> postsServiceFallback(Integer userId, Throwable throwable) {
+    	throw new SystemException("Posts service unavailable!", 200);
+    }
+    
+    public List<AuditionPost> commentsServiceFallback(String postId, Throwable throwable) {
+    	throw new SystemException("Comments service unavailable!", 200);
     }
 }

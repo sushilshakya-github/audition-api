@@ -33,6 +33,7 @@ management:
   endpoint:
     health:
       show-details: always
+  health.circuitbreakers.enabled: true
   info:
     env:
       enabled: true			
@@ -45,3 +46,14 @@ logging:
     level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
   level:
     com.audition.configuration.RestCallLoggingInterceptor: DEBUG
+resilience4j.circuitbreaker:
+  configs:
+    default:
+      registerHealthIndicator: true
+      slidingWindowSize: 10
+      minimumNumberOfCalls: 5
+      permittedNumberOfCallsInHalfOpenState: 3
+      automaticTransitionFromOpenToHalfOpenEnabled: true
+      waitDurationInOpenState: 5s
+      failureRateThreshold: 50
+      eventConsumerBufferSize: 10
