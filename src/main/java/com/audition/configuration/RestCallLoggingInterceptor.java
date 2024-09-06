@@ -10,6 +10,7 @@ import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 
+import io.micrometer.core.instrument.util.IOUtils;
 import io.prometheus.client.exemplars.tracer.common.SpanContextSupplier;
 
 @Component
@@ -57,7 +58,7 @@ public class RestCallLoggingInterceptor implements ClientHttpRequestInterceptor 
 			log.debug("Status code: {}", response.getStatusCode());
 			log.debug("Status text: {}", response.getStatusText());
 			log.debug("Headers: {}", response.getHeaders());
-			//log.debug("Response body: {}", IOUtils.toString(response.getBody()));
+			log.debug("Response body: {}", IOUtils.toString(response.getBody()));
 			log.debug("************** Response Log end *********************");
 		}
 	}
