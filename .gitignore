@@ -1,3 +1,4 @@
 
 .classpath
 target/classes/application.yml
+*.class
