@@ -79,12 +79,13 @@ Applicants need to do the following to submit their work:
 
 Below TODO tasks are done - 
 
-1. Controller and Service implemetation.
+1. Controller and Service implementation.
 2. Configuration of RestTemplate and ObjectMapper.
 3. Injection of openTelemetry trace and span Ids in the response headers in RestCallLoggingInterceptor.java.
-4. Actuator setting for info and health endpoints.
+4. Actuator setting for info and health end-points.
 5. Logger and Exception handling.
-6. Junit test cases for positive senarios only.
+6. Junit test cases for positive scenarios only.
+7. Circuit breaker implementation
 
 Kindly note, further code optimizations are possible, these are not done due to time constraint. Also, code coverage can be increased by writing negative test cases. Since Gradle and IntelliJ IDEA are new for me, so consumed a significant time to convert pom.xml based Maven project.
 
