@@ -19,6 +19,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
+import io.prometheus.client.exemplars.tracer.common.SpanContextSupplier;
+import io.prometheus.client.exemplars.tracer.otel.OpenTelemetrySpanContextSupplier;
 import io.swagger.v3.core.util.ObjectMapperFactory;
 
 
@@ -67,5 +69,11 @@ public class WebServiceConfiguration implements WebMvcConfigurer {
         requestFactory.setOutputStreaming(false);
         return requestFactory;
     }
+    
+	/*
+	 * @Bean public SpanContextSupplier getSpanContextSupplier() {
+	 * 
+	 * return new OpenTelemetrySpanContextSupplier(); }
+	 */
   
 }

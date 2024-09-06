@@ -47,7 +47,7 @@ public class AuditionIntegrationClient {
 		try {
 			auditPosts = Arrays.asList(objectMapper.readValue(jsonString, AuditionPost[].class));
 		} catch (JsonProcessingException e) {
-			throw new SystemException("Error while parsing json string");
+			throw new SystemException("Error while parsing json string", 500, e);
 		} catch (final HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
                 throw new SystemException("No posts found", 404);
@@ -69,7 +69,7 @@ public class AuditionIntegrationClient {
 			String jsonString = restTemplate.exchange(POSTS_URL+"/"+id, HttpMethod.GET, entity, String.class).getBody();
 			auditionPost = objectMapper.readValue(jsonString, AuditionPost.class);
 		} catch (JsonProcessingException e) {
-			throw new SystemException("Error while parsing json string");
+			throw new SystemException("Error while parsing json string", 500, e);
 		} catch (final HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
                 throw new SystemException("Cannot find a Post with id " + id, "Resource Not Found", 404);
