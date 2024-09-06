@@ -77,5 +77,18 @@ Applicants need to do the following to submit their work:
 ---
 ## Additional Information based on the implementation
 
-This section MUST be completed by applicants. It allows applicants to showcase their view on how an application can/should be documented. 
-Applicants can choose to do this in a separate markdown file that needs to be included when the code is committed. 
+Below TODO tasks are done - 
+
+1. Controller and Service implemetation.
+2. Configuration of RestTemplate and ObjectMapper.
+3. Injection of openTelemetry trace and span Ids in the response headers in RestCallLoggingInterceptor.java.
+4. Actuator setting for info and health endpoints.
+5. Logger and Exception handling.
+6. Junit test cases for positive senarios only.
+
+Kindly note, further code optimizations are possible, these are not done due to time constraint. Also, code coverage can be increased by writing negative test cases. Since Gradle and IntelliJ IDEA are new for me, so consumed a significant time to convert pom.xml based Maven project.
+
+I pushed two repositories for each-
+"https://github.com/sushilshakya-github/audition_api" is for Gradle and IntelliJIdea and 
+https://github.com/sushilshakya-github/audition-api for Maven and STS(Eclipse).
+      
