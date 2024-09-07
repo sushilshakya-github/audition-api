@@ -1,5 +1,10 @@
 package com.audition.web;
+import static org.hamcrest.CoreMatchers.containsStringIgnoringCase;
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -9,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -86,10 +92,12 @@ public class AuditionControllerTest {
     //get by Id controller
     @Test
     @Order(2)
-    public void getPostsByIdTest() throws Exception{
-        // precondition
+    public void getPostsByIdTest() throws Exception {
+        Integer id = 0;
+    	// precondition
         given(auditionService.getPostById(auditionPost.getId()+"")).willReturn(auditionPost);
-
+        assertNotNull(id);
+        assertTrue(id.intValue() <= 0);
         // action
         ResultActions response = mockMvc.perform(get("/posts/{id}", auditionPost.getId()));
 
@@ -124,7 +132,7 @@ public class AuditionControllerTest {
     //get comments by postId /comments?postId
     @Test
     @Order(4)
-    public void getCommentByPostId() throws Exception{
+    public void getCommentByPostId() throws Exception {
         // precondition
     	List<AuditionComment> auditionComments = new ArrayList<>();
         auditionComments.add(auditionComment);
@@ -139,5 +147,128 @@ public class AuditionControllerTest {
                 .andExpect(jsonPath("$[0].postId", is(auditionComment.getPostId())))
                 .andExpect(jsonPath("$[0].email", is(auditionComment.getEmail())))
                 .andExpect(jsonPath("$[0].body", is(auditionComment.getBody())));
+    }
+    
+   //get posts by userId /posts?filterParam
+    @Test
+    @Order(5)
+    public void getPostNodataFoundTest() throws Exception {
+        // precondition
+    	 List<AuditionPost> auditionPosts = new ArrayList<>();
+         //auditionPosts.add(auditionPost);
+         given(auditionService.getPosts()).willReturn(auditionPosts);
+
+         // action
+         ResultActions response = mockMvc.perform(get("/posts?userId="+auditionPost.getUserId()));
+         
+         // verify the output
+         response.andExpect(status().isOk())
+                 .andDo(print())
+                 .andExpect(jsonPath("$.title", containsStringIgnoringCase("Error")));
+    }
+    
+  
+    @Test
+    @Order(6)
+    public void filterParamNullTest() throws Exception {
+        // precondition
+    	 String filterParam = "2";
+         assertNotNull(filterParam);
+         assertFalse(filterParam.isEmpty());
+         assertTrue(filterParam.matches(".*\\d.*"));
+         
+         ResultActions response = mockMvc.perform(get("/posts?filterParam="+filterParam));
+         
+         // verify the output
+         response.andExpect(status().isOk())
+                 .andDo(print());
+        
+    }
+    
+    @Test
+    @Order(7)
+    public void filterParamLengthTest() throws Exception {
+        // precondition
+    	 String filterParam = "eiku";
+         assertNotNull(filterParam);
+         assertTrue(filterParam.length() >=3);
+         
+         ResultActions response = mockMvc.perform(get("/posts?filterParam="+filterParam));
+         
+         // verify the output
+         response.andExpect(status().isOk())
+                 .andDo(print());
+        
+    }
+    
+    // Negative test cases
+    
+    @Test
+    @Order(8)
+    public void postIdNumericTest() throws Exception {
+        // precondition
+    	 String postId = "4";
+         assertNotNull(postId);
+         assertTrue(StringUtils.isNumeric(postId));
+         
+         ResultActions response = mockMvc.perform(get("/posts/"+postId+"/comments"));
+         
+         // verify the output
+         response.andExpect(status().isOk())
+                 .andDo(print());
+        
+    }
+    
+    @Test
+    @Order(9)
+    public void postIdNotNumericTest() throws Exception {
+        // precondition
+    	 String postId = "not num";
+         assertNotNull(postId);
+         assertFalse(StringUtils.isNumeric(postId));
+         
+         ResultActions response = mockMvc.perform(get("/posts/"+postId+"/comments"));
+         response.andExpect(status().is4xxClientError()).andDo(print());
+         
+         ResultActions response2 = mockMvc.perform(get("/comments?postId="+postId));
+         response2.andExpect(status().is4xxClientError()).andDo(print());
+    }
+    
+    @Test
+    @Order(10)
+    public void commentListNotNullNotEmptyTest() throws Exception {
+        // precondition
+    	 String postId = "not num";
+         assertNotNull(postId);
+         assertFalse(postId.isEmpty());
+         
+         ResultActions response = mockMvc.perform(get("/posts/"+postId+"/comments"));
+         
+         // verify the output
+         response.andExpect(status().is4xxClientError())
+                 .andDo(print());
+    }
+    
+    @Test
+    @Order(11)
+    public void postIdValueGreaterThanZeroTest() throws Exception {
+    	 Integer id = 0;
+         assertNotNull(id);
+         assertTrue(id.intValue() <= 0);
+         // action
+         ResultActions response = mockMvc.perform(get("/posts/{id}", id));
+
+        response.andExpect(status().is4xxClientError()).andDo(print());
+    }
+    
+    @Test
+    @Order(12)
+    public void getPostIdNotNullShouldNumericTest() throws Exception {
+		String postId = null;
+		assertNull(postId);
+		//assertTrue(StringUtils.isNumeric(postId));
+		ResultActions response = mockMvc.perform(get("/posts/"+postId+"/comments"));
+
+		response.andExpect(status().is4xxClientError()).andDo(print());
     }
 }

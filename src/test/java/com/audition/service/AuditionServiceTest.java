@@ -14,8 +14,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
+import com.audition.common.logging.AuditionLogger;
 import com.audition.integration.AuditionIntegrationClient;
+import com.audition.model.AuditionComment;
 import com.audition.model.AuditionPost;
 
 
@@ -29,8 +32,11 @@ public class AuditionServiceTest {
     @InjectMocks
     private AuditionService auditionService;
 
+    @MockBean
+	public AuditionLogger auditionLogger;
+    
     private AuditionPost auditionPost;
-
+    private AuditionComment auditionComment;
 
     @BeforeEach
     public void setup(){
@@ -41,6 +47,14 @@ public class AuditionServiceTest {
                 .title("IT Professional")
                 .body("Assignment work service")
                 .build();
+    	
+    	auditionComment = AuditionComment.builder()
+                .id(11)
+                .postId(3)
+                .name("Alex")
+                .email("alex@xyz.com")
+                .body("Comments Assignment work")
+                .build();
     }
 
     @Test
@@ -48,7 +62,6 @@ public class AuditionServiceTest {
     public void getPostById(){
         // precondition
         given(auditionIntegrationClient.getPostById("1")).willReturn(auditionPost);
-
         // action
         AuditionPost existingAuditionPost = auditionService.getPostById(auditionPost.getId()+"");
 
@@ -61,7 +74,7 @@ public class AuditionServiceTest {
 
     @Test
     @Order(2)
-    public void getAllEmployee(){
+    public void getAllPost(){
     	AuditionPost auditionPostObj = AuditionPost.builder()
                 .id(1)
                 .userId(1)
@@ -79,6 +92,52 @@ public class AuditionServiceTest {
         System.out.println(auditionPosts);
         assertThat(auditionPosts).isNotNull();
         assertThat(auditionPosts.size()).isGreaterThan(1);
+    }
+    
+    @Test
+    @Order(3)
+    public void getPostComments(){
+    	AuditionComment auditionCommentObj = AuditionComment.builder()
+   			 .id(11)
+                .postId(3)
+                .name("Alex")
+                .email("alex@xyz.com")
+                .body("Comments Assignment work")
+                .build();
+    	// precondition
+        given(auditionIntegrationClient.getComments(auditionComment.getPostId()+"")).willReturn(List.of(auditionComment, auditionCommentObj));
+
+        // action
+        List<AuditionComment> existingAuditionComments = auditionService.getPostComments(auditionComment.getPostId()+"");
+
+        // verify
+        System.out.println(existingAuditionComments);
+        assertThat(existingAuditionComments).isNotNull();
+
+    }
+
+
+    @Test
+    @Order(4)
+    public void getCommentbyPostId(){
+    	AuditionComment auditionCommentObj = AuditionComment.builder()
+    			 .id(11)
+                 .postId(3)
+                 .name("Alex")
+                 .email("alex@xyz.com")
+                 .body("Comments Assignment work")
+                 .build();
+
+        // precondition
+        given(auditionIntegrationClient.getCommentByPostId(auditionComment.getPostId()+"")).willReturn(List.of(auditionComment, auditionCommentObj));
+
+        // action
+        List<AuditionComment> auditionComments = auditionService.getCommentbyPostId(auditionComment.getPostId()+"");
+
+        // verify
+        System.out.println(auditionComments);
+        assertThat(auditionComments).isNotNull();
+        assertThat(auditionComments.size()).isGreaterThan(1);
     }
   
 }

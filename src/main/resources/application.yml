@@ -45,6 +45,7 @@ logging:
   pattern:
     level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
   level:
+    com.audition: INFO
     com.audition.configuration.RestCallLoggingInterceptor: DEBUG
 resilience4j.circuitbreaker:
   configs:

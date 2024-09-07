@@ -6,7 +6,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import com.audition.configuration.RestCallLoggingInterceptor;
 
-@SpringBootTest
+@SpringBootTest(useMainMethod = SpringBootTest.UseMainMethod.ALWAYS)
 class AuditionApplicationTests {
 
     // TODO implement unit test. Note that an applicant should create additional unit tests as required.
@@ -15,6 +15,11 @@ class AuditionApplicationTests {
 	
     @Test
     void contextLoads() {
+    }
+    
+    @Test
+    void main() {
+    	
     }
 
 }

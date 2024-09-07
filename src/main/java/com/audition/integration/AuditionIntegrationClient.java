@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -20,8 +22,12 @@ import com.audition.model.AuditionPost;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+
 @Component
 public class AuditionIntegrationClient {
+	
+	private static final Logger log = LoggerFactory.getLogger(AuditionIntegrationClient.class);
 
 	String POSTS_URL = "https://jsonplaceholder.typicode.com/posts";
 	String COMMENTS_URL = "https://jsonplaceholder.typicode.com/comments";
@@ -39,8 +45,10 @@ public class AuditionIntegrationClient {
 		return entity;
 	}
     
+    @CircuitBreaker(name = "postsCircuitBreaker", fallbackMethod = "postsServiceFallback")
     public List<AuditionPost> getPosts() {
         // TODO make RestTemplate call to get Posts from https://jsonplaceholder.typicode.com/posts
+    	log.info("calling posts external service..");
     	HttpEntity<String> entity = prepareRequest();
         String jsonString = restTemplate.exchange(POSTS_URL, HttpMethod.GET, entity, String.class).getBody();
         List<AuditionPost> auditPosts = new ArrayList<>();
@@ -127,4 +135,8 @@ public class AuditionIntegrationClient {
 		return auditionComment;
     }
     
+    public List<AuditionPost> postsServiceFallback(Throwable throwable) {
+    	log.warn("postsServiceFallback..", throwable.getCause());
+    	throw new SystemException("Posts service unavailable!", 200);
+    }
 }
