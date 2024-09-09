@@ -58,14 +58,14 @@ public class AuditionLogger {
 
     private String createStandardProblemDetailMessage(final ProblemDetail standardProblemDetail) {
         // TODO Add implementation here.
-    	standardProblemDetail.setTitle("Standard Error");
+    	standardProblemDetail.setTitle("Standard Error :"+standardProblemDetail.getTitle());
     	return standardProblemDetail.toString();
     }
 
     private String createBasicErrorResponseMessage(final Integer errorCode, final String message) {
         // TODO Add implementation here.
     	 final ProblemDetail problemDetail = ProblemDetail.forStatus(errorCode);
-         problemDetail.setTitle("Basic Error");
+         problemDetail.setTitle("Basic Error: "+problemDetail.getTitle());
          problemDetail.setDetail(message);
         return problemDetail.toString();
     }

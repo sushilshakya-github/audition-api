@@ -3,8 +3,6 @@ package com.audition.web.advice;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -23,18 +21,19 @@ import com.audition.common.logging.AuditionLogger;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 
 
 @ControllerAdvice
+@Slf4j
 public class ExceptionControllerAdvice extends ResponseEntityExceptionHandler {
 
     public static final String DEFAULT_TITLE = "API Error Occurred";
-    private static final Logger LOG = LoggerFactory.getLogger(ExceptionControllerAdvice.class);
     private static final String ERROR_MESSAGE = " Error Code from Exception could not be mapped to a valid HttpStatus Code - ";
     private static final String DEFAULT_MESSAGE = "API Error occurred. Please contact support or administrator.";
 
     @Autowired
-    private AuditionLogger logger;
+    private AuditionLogger auditionLogger;
 
     @ExceptionHandler(HttpClientErrorException.class)
     ProblemDetail handleHttpClientException(final HttpClientErrorException e) {
@@ -46,7 +45,7 @@ public class ExceptionControllerAdvice extends ResponseEntityExceptionHandler {
     @ExceptionHandler(Exception.class)
     ProblemDetail handleMainException(final Exception e) {
         // TODO Add handling for Exception
-    	LOG.error("Exception: ", e.getCause());
+    	auditionLogger.logErrorWithException(log, "Exception:", e);
         final HttpStatusCode status = getHttpStatusCodeFromException(e);
         return createProblemDetail(e, status);
 
@@ -55,7 +54,7 @@ public class ExceptionControllerAdvice extends ResponseEntityExceptionHandler {
     @ExceptionHandler(SystemException.class)
     ProblemDetail handleSystemException(final SystemException e) {
         // TODO `Add Handling for SystemException
-    	LOG.error("System Exception: ", e.getCause());
+    	auditionLogger.logErrorWithException(log, "SystemException:", e);
         final HttpStatusCode status = getHttpStatusCodeFromSystemException(e);
         return createProblemDetail(e, status);
 
@@ -85,7 +84,7 @@ public class ExceptionControllerAdvice extends ResponseEntityExceptionHandler {
         try {
             return HttpStatusCode.valueOf(exception.getStatusCode());
         } catch (final IllegalArgumentException iae) {
-            logger.info(LOG, ERROR_MESSAGE + exception.getStatusCode());
+        	auditionLogger.error(log, ERROR_MESSAGE + exception.getStatusCode());
             return INTERNAL_SERVER_ERROR;
         }
     }
@@ -103,7 +102,7 @@ public class ExceptionControllerAdvice extends ResponseEntityExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ProblemDetail handleConstraintViolationException(HttpServletRequest request, Exception e) {
-        LOG.error(e.getMessage(), e);
+    	auditionLogger.logErrorWithException(log, "ConstraintViolationException", e);
         return createProblemDetail(e, HttpStatusCode.valueOf(400));
     }  
    

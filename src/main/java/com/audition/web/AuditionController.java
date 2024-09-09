@@ -8,13 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.*;
 import com.audition.common.exception.SystemException;
 import com.audition.model.AuditionComment;
 import com.audition.model.AuditionPost;
@@ -30,8 +24,8 @@ public class AuditionController {
     AuditionService auditionService;
 
     // TODO Add a query param that allows data filtering. The intent of the filter is at developers discretion.
-    @RequestMapping(value = "/posts", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody List<AuditionPost> getPosts(@RequestParam(name ="filterParam", required = false) final String filterParam) {
+    @GetMapping(value = "/posts", produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody List<AuditionPost> getPosts(@RequestParam(required = false) final String filterParam) {
 
         // TODO Add logic that filters response data based on the query param
     	List<AuditionPost> auditionPosts = null;

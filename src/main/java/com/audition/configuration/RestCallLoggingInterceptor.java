@@ -2,8 +2,6 @@ package com.audition.configuration;
 
 import java.io.IOException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
@@ -12,12 +10,12 @@ import org.springframework.stereotype.Component;
 
 import io.micrometer.core.instrument.util.IOUtils;
 import io.prometheus.client.exemplars.tracer.common.SpanContextSupplier;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
+@Slf4j
 public class RestCallLoggingInterceptor implements ClientHttpRequestInterceptor {
 
-	private static final Logger log = LoggerFactory.getLogger(RestCallLoggingInterceptor.class);
-	
 	private final SpanContextSupplier spanContextSupplier;
 	
 	public RestCallLoggingInterceptor(SpanContextSupplier spanContextSupplier) {
